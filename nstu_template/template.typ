@@ -1,4 +1,5 @@
 // NSTU report template by Begichev Alexander (https://github.com/Breadp4ck)
+// with help from Tombleron (https://github.com/Tombleron)
 
 #let project(
   faculty: none, // ФПМИ, АВТф
@@ -88,7 +89,54 @@
   
   // Main body.
   set page(numbering: "1", number-align: center)
-  set par(justify: true)
+  set heading(numbering: "1.")
+  show heading: set block(above: 1em, below: 1em)
 
+  // Add paragraph indent (TODO: with bug #311 workaround)
+  set par(justify: true, first-line-indent: 1.8em )
+  show par: set block(spacing: 0.5em)
+  show heading: it => {
+    it
+    par(text(size:0.00em, h(0.0em)))
+  }
+  show figure: it => {
+    it
+    par(text(size:0.00em, h(0.0em)))
+  }
+  show image: it => {
+    it
+    par(text(size:0.00em, h(0.0em)))
+  }
+
+  // Add table caption to top right
+  show figure.where(kind: table): it => box(width:100%)[
+    #v(if it.has("gap") {it.gap} else {0.65em})
+    #set align(right)
+    #set par(hanging-indent: 1cm, justify: true)
+    #pad(x: 0cm)[#it.caption]
+    #align(center)[#it.body]
+  ]
+  
   body
+}
+
+// Import nice listing library (remove when not needed)
+#import "@preview/codelst:1.0.0": sourcecode
+#let sourcecode = sourcecode.with(
+  frame: block.with(
+    fill: white,
+    radius: 1em,
+    inset: (rest: 0.8em),
+    stroke: (paint: gray, thickness: 1pt, dash: "solid")
+  )
+)
+
+// Paste code from file
+// TODO: This approach feels s wrong...
+#let lst(source, lang) = {
+  // TODO: Workaround for line indent
+  set par(justify: true, first-line-indent: .0em )
+  set text(size:10pt, font: ("Fira Code"))
+  // Breaks umbering on long strings without spaces
+  sourcecode(lang: lang)[#raw(read("../" + source))]
 }
