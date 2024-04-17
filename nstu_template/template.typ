@@ -1,5 +1,5 @@
 // NSTU report template by Begichev Alexander (https://github.com/Breadp4ck)
-// with help from Tombleron (https://github.com/Tombleron)
+// with help from Tombleron (https://github.com/Tombleron)  show image: it => {
 
 #let project(
   faculty: none, // ФПМИ, АВТф
@@ -13,13 +13,14 @@
   group: none,
   team: none,
   year: none,
+  show_title_page: true,
   body,
 ) = {
   // Set the document's basic properties.
   set document(author: students, title: task_name)
   set text(font: ("Raleway", "Fira Code"), lang: "ru", weight: "regular")
 
-  page(
+  if show_title_page { page(
     background: image("images/border.png", width: 90%),
     align(center + horizon)[
    
@@ -85,12 +86,15 @@
     #align(center + bottom)[
       #if {year != none} [Новосибирск, #year] else [Новосибирск]
     ]
-  ])
+  ])}
   
-  // Main body.
+  // = Main body config
+  
   set page(numbering: "1", number-align: center)
   set heading(numbering: "1.")
   show heading: set block(above: 1em, below: 1em)
+
+  // = Paragraph config
 
   // Add paragraph indent (TODO: with bug #311 workaround)
   set par(justify: true, first-line-indent: 1.8em )
@@ -116,9 +120,28 @@
     #pad(x: 0cm)[#it.caption]
     #align(center)[#it.body]
   ]
+
+  // = Math config
+  
+  set math.equation(
+    numbering: "(1)",
+    supplement: none,
+  )
+  
+  show ref: it => {
+    // provide custom reference for equations
+    if it.element != none and it.element.func() == math.equation {
+      // optional: wrap inside link, so whole label is linked
+      link(it.target)[(#it)]
+    } else {
+      it
+    }
+  }
   
   body
 }
+
+// = Code config
 
 // Import nice listing library (remove when not needed)
 #import "@preview/codelst:1.0.0": sourcecode
@@ -140,3 +163,10 @@
   // Breaks umbering on long strings without spaces
   sourcecode(lang: lang)[#raw(read("../" + source))]
 }
+
+// = Funny emphasizings
+#let amazed(term) = box[✨ #term ✨]
+#let blazed(term) = box[🔥 #term 🔥]
+#let zapped(term) = box[⚡ #term ⚡]
+#let exploded(term) = box[💥 #term 💥]
+#let celebrated(term) = box[🎉 #term 🎉]
